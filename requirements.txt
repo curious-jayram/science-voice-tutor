@@ -1,0 +1,8 @@
+pipecat-ai[google,sarvam,silero,webrtc]>=1.8.0,<2
+pipecat-ai-prebuilt>=1.0.5,<2
+fastapi>=0.115.6,<1
+uvicorn>=0.32,<1
+google-genai>=2.24.0,<3
+python-dotenv>=1.0,<2
+loguru>=0.7,<1
+pytest>=9,<10
