@@ -50,11 +50,27 @@ elsewhere.
 python main.py
 ```
 
-Open `http://127.0.0.1:7860` to use the bundled WebRTC client. The client
-creates a session at `POST /start`, then exchanges the WebRTC offer at
-`/sessions/{sessionId}/api/offer`. FastAPI also exposes a health check at
-`/health` and interactive API documentation at `/docs`. Set `HOST` or `PORT`
-to override the default bind address.
+Open `http://127.0.0.1:7860` for the local WebRTC client on this machine. The
+client creates a session at `POST /start`, then exchanges the WebRTC offer at
+`/sessions/{sessionId}/api/offer`.
+
+The shareable voice path runs on Pipecat Cloud. Cloud creates a Daily room
+for each session and starts `bot()` in `bot.py`. Deploy with the Pipecat CLI:
+
+```powershell
+pipecat cloud auth login
+pipecat cloud secrets set ncert-science-tutor-secrets --file .env --skip
+pipecat cloud deploy
+pipecat cloud agent start ncert-science-tutor --use-daily
+```
+
+Open the Daily URL that start command prints, or use the agent Sandbox in the
+Pipecat Cloud dashboard. Keep the camera off so the session stays a 1:1 voice
+call.
+
+FastAPI also exposes a health check at `/health` and interactive API
+documentation at `/docs`. Set `HOST` or `PORT` to override the default bind
+address.
 
 For development with automatic reload:
 

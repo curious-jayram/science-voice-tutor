@@ -1,0 +1,8 @@
+.venv
+.git
+.env
+.rag_index
+__pycache__
+.pytest_cache
+data
+tests

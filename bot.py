@@ -217,7 +217,7 @@ class SpokenCitationFilter(FrameProcessor):
             await self.push_frame(frame, direction)
 
 
-async def run_bot(transport: BaseTransport):
+async def run_bot(transport: BaseTransport, *, greet_on_join: bool = False):
     runner = WorkerRunner(handle_sigint=False)
 
     sarvam_api_key = os.environ["SARVAM_API_KEY"]
@@ -324,8 +324,13 @@ async def run_bot(transport: BaseTransport):
         ),
     )
 
-    @agent.rtvi.event_handler("on_client_ready")
-    async def on_client_ready(rtvi):
+    greeted = False
+
+    async def greet_student() -> None:
+        nonlocal greeted
+        if greeted:
+            return
+        greeted = True
         context.add_message(
             {
                 "role": "developer",
@@ -336,6 +341,17 @@ async def run_bot(transport: BaseTransport):
             }
         )
         await agent.queue_frames([LLMRunFrame()])
+
+    @agent.rtvi.event_handler("on_client_ready")
+    async def on_client_ready(rtvi):
+        await greet_student()
+
+    if greet_on_join:
+
+        @transport.event_handler("on_first_participant_joined")
+        async def on_first_participant_joined(transport, participant):
+            logger.info("Student joined the Daily room")
+            await greet_student()
 
     @transport.event_handler("on_client_connected")
     async def on_client_connected(transport, client):
@@ -359,3 +375,29 @@ async def start_bot(connection: SmallWebRTCConnection) -> None:
         webrtc_connection=connection,
     )
     await run_bot(transport)
+
+
+async def start_daily_bot(room_url: str, token: str) -> None:
+    """Join a Daily room as a voice-only tutor. Video stays off.
+
+    The Daily native library publishes Linux and macOS wheels only, so this
+    import fails on Windows until the process runs in Linux or Docker.
+    """
+    from pipecat.transports.daily.transport import DailyParams, DailyTransport
+
+    transport = DailyTransport(
+        room_url,
+        token,
+        "NCERT Science Tutor",
+        params=DailyParams(
+            audio_in_enabled=True,
+            audio_out_enabled=True,
+            camera_out_enabled=False,
+        ),
+    )
+    await run_bot(transport, greet_on_join=True)
+
+
+async def bot(args) -> None:
+    """Pipecat Cloud entry point. Cloud creates the Daily room and passes it in."""
+    await start_daily_bot(args.room_url, args.token)
