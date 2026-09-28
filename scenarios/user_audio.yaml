@@ -1,0 +1,5 @@
+modality: audio
+speech:
+  factory: evals.speech.sarvam
+  voice: kavya
+  language: en-IN

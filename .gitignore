@@ -7,3 +7,7 @@ __pycache__/
 .mypy_cache/
 .rag_index/
 data/**/*.pdf
+eval-runs/
+recordings/
+*.eval.log
+*.debug.log

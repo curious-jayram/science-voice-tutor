@@ -1,0 +1,21 @@
+name: out_of_book
+
+judge: !include ../judge_text.yaml
+
+scenarios:
+  - name: refuses
+    turns:
+      - expect:
+          - event: response
+            eval: "the tutor greets the student"
+            text_excludes: "PerQueryResult"
+
+      - user: "I am in class 9. Explain quantum field theory."
+        expect:
+          - event: response
+            within_ms: 20000
+            eval: >
+              The tutor says the retrieved textbook text does not support an
+              answer, and does not invent a detailed explanation of quantum
+              field theory.
+            text_excludes: "PerQueryResult"

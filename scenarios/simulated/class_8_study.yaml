@@ -1,0 +1,28 @@
+name: class_8_study
+
+judge: !include ../judge_text.yaml
+simulator: !include ../simulator.yaml
+
+scenarios:
+  - name: photosynthesis
+    persona: |
+      A Class 8 student. Says the class in the first reply. Asks one short
+      question at a time. Wants photosynthesis explained, then one follow-up
+      about where it happens in the plant. Polite. Speaks simple English.
+    goal: "Learn what photosynthesis is and where it happens, then end the call."
+    success: >
+      The tutor grounded the explanation in Class 8 science, answered both
+      questions, and did not dump markdown, bullets, or citation markers.
+    metrics:
+      - name: spoken_style
+        criterion: "the reply is brief, warm, conversational, and free of markdown, bullets, and filenames"
+        min_score: 1
+      - name: latin_script
+        criterion: "the reply uses Latin script only"
+        min_score: 1
+      - measure: words
+        max_value: 140
+      - measure: latency
+        max_value: 20
+    max_turns: 8
+    runs: 3

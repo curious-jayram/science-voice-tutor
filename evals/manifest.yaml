@@ -1,0 +1,14 @@
+# Fresh process per scenario, so context and the greeting do not carry over.
+# Run from the repo root: python -m pipecat.evals suite evals/manifest.yaml
+concurrency: 1
+runs_dir: ../eval-runs
+scenarios_dir: ../scenarios
+spawn: "{python} {bot} --port {port}"
+
+suite:
+  - bot: serve.py
+    scenarios:
+      - scripted/photosynthesis
+      - scripted/out_of_book
+      - simulated/class_8_study
+      - audio/spoken

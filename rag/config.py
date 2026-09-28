@@ -33,12 +33,15 @@ def load_file_search_store(settings: RAGSettings | None = None) -> str:
     if not settings.manifest_path.exists():
         raise RuntimeError(
             "The NCERT File Search store has not been created. "
-            "Run `python -m rag.indexer` first."
+            "Run `python -m rag.indexer` first. "
+            "On Pipecat Cloud, set FILE_SEARCH_STORE to the store_name in "
+            ".rag_index/file_search.json. The Cloud image does not include that file."
         )
     payload = json.loads(settings.manifest_path.read_text(encoding="utf-8"))
     store_name = str(payload.get("store_name") or "").strip()
     if not store_name:
         raise RuntimeError(
-            "The NCERT File Search manifest has no store. Run `python -m rag.indexer`."
+            "The NCERT File Search manifest has no store. Run `python -m rag.indexer`. "
+            "On Pipecat Cloud, set FILE_SEARCH_STORE to that store name."
         )
     return store_name

@@ -1,0 +1,7 @@
+modality: audio
+transcription:
+  service: moonshine
+  language: en
+eval:
+  factory: evals.judge.gemini
+  model: gemini-3.8-flash

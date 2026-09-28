@@ -1,0 +1,4 @@
+# Audio-mode evals and the Pipecat CLI. Not installed by the Cloud image.
+# Install with requirements.txt. Both files pin pipecat-ai==1.11.0 so the
+# extras combine. Kokoro is not used: the student speaks with Sarvam.
+pipecat-ai[moonshine,cli]==1.11.0

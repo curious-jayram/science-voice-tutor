@@ -8,12 +8,25 @@ Google File Search, which chunks, embeds, and retrieves passages inside one mode
 
 Use Python 3.11 or newer.
 
-```powershell
+Git Bash:
+
+```bash
 python -m venv .venv
 source .venv/Scripts/activate
 pip install -r requirements.txt
+cp .env.example .env
+```
+
+PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
+
+`requirements.txt` skips the Daily extra on Windows, because that library has no Windows wheel. The local client at `http://127.0.0.1:7860` uses WebRTC and does not need it. Linux and macOS installs include Daily, which `GET /call` and the Cloud image use.
 
 Set `SARVAM_API_KEY` and `GOOGLE_API_KEY` in `.env`. Put one PDF per chapter under `data/`.
 The filename must contain the class, chapter number, and chapter title:
@@ -40,9 +53,12 @@ On the Gemini free tier, a daily quota error stops the command at the chapter th
 Completed chapters stay in the store. Rerun the same command after the quota resets and it
 continues with the remaining files. Use `--force` to upload every PDF again.
 
-Do not start the voice tutor until the upload finishes. The tutor reads the store name
-from the manifest. Set `FILE_SEARCH_STORE` only when you want to point at a store created
-elsewhere.
+Do not start the voice tutor until the upload finishes. A local tutor reads the store
+name from the manifest when `FILE_SEARCH_STORE` is empty.
+
+Pipecat Cloud does not include `.rag_index`. Copy `store_name` from
+`.rag_index/file_search.json` into `FILE_SEARCH_STORE` in `.env` before the
+secrets command below. Cloud reads only that variable.
 
 ## Run
 
@@ -88,3 +104,32 @@ pytest -q
 ```
 
 Tests use a fake File Search client and do not make paid API calls.
+
+## Evals
+
+Behavioral evals drive the real tutor. Text mode still calls Gemini and File Search, and it skips Sarvam. Run them from the repo root after `python -m rag.indexer`.
+
+One scenario against a bot you leave running:
+
+```powershell
+python -m evals.serve --port 7861
+python -m pipecat.evals run scenarios/scripted scenarios/simulated --bot-url ws://localhost:7861 -v --logs-dir eval-runs
+```
+
+The full suite starts a fresh tutor per scenario. Text scenarios skip Sarvam. Audio scenarios speak the student with Sarvam `bulbul:v3` voice `kavya` (Indian English), run Sarvam speech recognition and the tutor voice `shubh`, and judge a Moonshine transcript of what was spoken.
+
+```powershell
+python -m pipecat.evals suite evals/manifest.yaml
+```
+
+Audio mode needs the Pipecat CLI and Moonshine, which are not part of the Cloud image. Install them into the same environment as the tutor so the Pipecat extras combine:
+
+```bash
+pip install -r requirements.txt -r requirements-evals.txt
+```
+
+Run only the speech scenarios with:
+
+```powershell
+python -m pipecat.evals suite evals/manifest.yaml -s audio
+```

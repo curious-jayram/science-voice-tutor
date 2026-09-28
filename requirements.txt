@@ -1,4 +1,7 @@
-pipecat-ai[google,sarvam,silero,webrtc,daily]>=1.8.0,<2
+# Daily's Python library has no Windows wheel. Cloud and local /call
+# installs pick it up below; a Windows WebRTC install skips that line.
+pipecat-ai[google,sarvam,silero,webrtc]==1.11.0
+pipecat-ai[daily]==1.11.0; platform_system != "Windows"
 pipecat-ai-prebuilt>=1.0.5,<2
 fastapi>=0.115.6,<1
 uvicorn>=0.32,<1

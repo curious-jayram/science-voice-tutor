@@ -1,0 +1,70 @@
+name: audio
+
+user: !include ../user_audio.yaml
+judge: !include ../judge_audio.yaml
+
+scenarios:
+  - name: photosynthesis
+    turns:
+      - expect:
+          - event: response
+            eval: "the tutor greets the student and asks their class or what they want help with"
+            text_excludes: "PerQueryResult"
+
+      - user: "I am in class eight. What is photosynthesis?"
+        expect:
+          - event: response
+            within_ms: 120000
+            eval: >
+              The reply explains photosynthesis from the NCERT Class 8 science
+              textbook, in short spoken sentences, and does not invent a
+              chapter that was not retrieved.
+            text_excludes: "PerQueryResult"
+
+      - user: "Which class did I say I am in?"
+        expect:
+          - event: response
+            eval: "the tutor remembers the student is in class 8"
+            text_excludes: "PerQueryResult"
+
+  - name: out_of_book
+    turns:
+      - expect:
+          - event: response
+            eval: "the tutor greets the student"
+            text_excludes: "PerQueryResult"
+
+      - user: "I am in class nine. Explain quantum field theory."
+        expect:
+          - event: response
+            within_ms: 120000
+            eval: >
+              The tutor says the retrieved textbook text does not support an
+              answer, and does not invent a detailed explanation of quantum
+              field theory.
+            text_excludes: "PerQueryResult"
+
+  - name: class_8_study
+    simulator: !include ../simulator.yaml
+    persona: |
+      A Class 8 student. Says the class in the first reply as the words
+      "class eight", not a digit. Asks one short
+      question at a time. Wants photosynthesis explained, then one follow-up
+      about where it happens in the plant. Polite. Speaks simple English.
+    goal: "Learn what photosynthesis is and where it happens, then end the call."
+    success: >
+      The tutor grounded the explanation in Class 8 science, answered both
+      questions, and did not dump markdown, bullets, or citation markers.
+    metrics:
+      - name: spoken_style
+        criterion: "the reply is brief, warm, conversational, and free of markdown, bullets, and filenames"
+        min_score: 1
+      - name: latin_script
+        criterion: "the reply uses Latin script only"
+        min_score: 1
+      - measure: words
+        max_value: 140
+      - measure: latency
+        max_value: 30
+    max_turns: 8
+    runs: 1

@@ -1,0 +1,2 @@
+factory: evals.judge.gemini
+model: gemini-3.8-flash

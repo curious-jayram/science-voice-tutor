@@ -1,0 +1,27 @@
+name: photosynthesis
+
+judge: !include ../judge_text.yaml
+
+scenarios:
+  - name: class_8
+    turns:
+      - expect:
+          - event: response
+            eval: "the tutor greets the student and asks their class or what they want help with"
+            text_excludes: "PerQueryResult"
+
+      - user: "I am in class 8. What is photosynthesis?"
+        expect:
+          - event: response
+            within_ms: 20000
+            eval: >
+              The reply explains photosynthesis from the NCERT Class 8 science
+              textbook, in short spoken sentences, and does not invent a
+              chapter that was not retrieved.
+            text_excludes: "PerQueryResult"
+
+      - user: "Which class did I say I am in?"
+        expect:
+          - event: response
+            eval: "the tutor remembers the student is in class 8"
+            text_excludes: "PerQueryResult"
